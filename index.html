@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>L — Personal Website (Admissions)</title>
+  <style>
+    :root{
+      --text:#ededf2;
+      --muted:#b9b9c2;
+      --muted2:#8e8e99;
+      --line:#2a2a30;
+      --line2:#3a3a42;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 30px rgba(0,0,0,.4);
+      --r2:18px;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      /* deep red -> deep blue range */
+      --c1:#16070b;
+      --c2:#061018;
+      --c3:#0b0616;
+      --c4:#06161a;
+
+      /* sphere grayscale intensity set by JS */
+      --ballBright: 0;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      overflow:hidden;
+
+      background:
+        radial-gradient(1100px 800px at 20% 15%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
+        radial-gradient(900px 650px at 80% 30%, rgba(255,255,255,.045), rgba(255,255,255,0) 55%),
+        linear-gradient(120deg, var(--c1), var(--c2));
+      animation: bgShift 10s linear infinite alternate;
+    }
+
+    @keyframes bgShift{
+      0%   { background:
+        radial-gradient(1100px 800px at 20% 15%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
+        radial-gradient(900px 650px at 80% 30%, rgba(255,255,255,.045), rgba(255,255,255,0) 55%),
+        linear-gradient(120deg, var(--c1), var(--c2));
+      }
+      50%  { background:
+        radial-gradient(1100px 800px at 25% 18%, rgba(255,255,255,.055), rgba(255,255,255,0) 60%),
+        radial-gradient(900px 650px at 75% 28%, rgba(255,255,255,.040), rgba(255,255,255,0) 55%),
+        linear-gradient(120deg, var(--c3), var(--c4));
+      }
+      100% { background:
+        radial-gradient(1100px 800px at 18% 12%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
+        radial-gradient(900px 650px at 82% 35%, rgba(255,255,255,.045), rgba(255,255,255,0) 55%),
+        linear-gradient(120deg, var(--c2), var(--c1));
+      }
+    }
+
+    /* grayscale fluid-ish overlay canvas */
+    #bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      filter: contrast(115%) saturate(0) brightness(105%);
+      opacity:1;
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      height:100%;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-width:0;
+    }
+
+    header{
+      border:1px solid var(--line);
+      border-radius:var(--r2);
+      background: linear-gradient(180deg, rgba(30,30,36,.72), rgba(14,14,16,.62));
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding:14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      min-width:0;
+    }
+    header h1{
+      margin:0;
+      font-size:18px;
+      font-weight:850;
+      letter-spacing:.2px;
+    }
+    header .sub{
+      margin:6px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.4;
+      max-width: 90ch;
+    }
+    .headerRight{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:8px;
+      flex:0 0 auto;
+    }
+    .badge{
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      background: rgba(18,18,20,.65);
+      padding:4px 8px;
+      border-radius:999px;
+      white-space:nowrap;
+      user-select:none;
+    }
+
+    .main{
+      flex:1 1 auto;
+      border:1px solid var(--line);
+      border-radius:var(--r2);
+      background: linear-gradient(180deg, rgba(22,22,26,.78), rgba(14,14,16,.60));
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .mainTop{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(22,22,26,.35);
+      min-width:0;
+    }
+    .mainTop .hint{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.3;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .mainTop .tools{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      flex:0 0 auto;
+    }
+
+    .btn{
+      border:1px solid var(--line2);
+      background: linear-gradient(180deg, rgba(36,36,42,.9), rgba(20,20,23,.9));
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      user-select:none;
+      font-size:13px;
+      transition: transform .05s ease, border-color .15s ease, filter .15s ease;
+    }
+    .btn:hover{border-color:#73737f; filter:brightness(110%)}
+    .btn:active{transform: translateY(1px)}
+    .btn.ghost{background: rgba(16,16,18,.55)}
+    .btn.danger{
+      border-color:#55555e;
+      background: linear-gradient(180deg, rgba(35,35,38,.9), rgba(16,16,18,.9));
+    }
+
+    .stage{
+      position:relative;
+      flex:1 1 auto;
+      min-height:0;
+      overflow:hidden;
+      contain: layout paint size style;
+    }
+
+    /* spheres: fixed DOM size, scale via transform */
+    .ball{
+      position:absolute;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(140px 140px at 30% 28%, rgba(255,255,255,.14), rgba(255,255,255,0) 55%),
+        radial-gradient(180px 180px at 60% 65%, rgba(255,255,255,.07), rgba(0,0,0,0) 70%),
+        linear-gradient(180deg,
+          rgba(var(--ballBright, 0), var(--ballBright, 0), var(--ballBright, 0), .85),
+          rgba(0,0,0,.78)
+        );
+      box-shadow:
+        0 20px 60px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.08);
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      cursor:pointer;
+      user-select:none;
+
+      transform: translate3d(0,0,0) scale(1);
+      transform-origin: center center;
+      transition: filter .12s ease, border-color .12s ease;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    .ball:hover{border-color: rgba(255,255,255,.18);}
+    .ball .label{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .ball .title{
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.2px;
+      line-height:1.15;
+      max-width: 18ch;
+    }
+    .ball .desc{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.25;
+      max-width: 22ch;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+    }
+    .ball .tiny{
+      font-size:11px;
+      color:var(--muted2);
+      font-family: var(--mono);
+    }
+
+    /* overlay (full-screen) */
+    .overlay{
+      position:fixed;
+      inset:0;
+      z-index:9;
+      display:none;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .overlay.show{display:block;}
+
+    .sheet{
+      position:absolute;
+      inset: 14px;
+      border:1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(18,18,20,.95), rgba(12,12,14,.90));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      min-height:0;
+    }
+    .sheetHead{
+      padding:12px 12px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: rgba(22,22,26,.35);
+    }
+    .sheetHead .left{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .sheetHead .sheetTitle{
+      margin:0;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .sheetHead .sheetSub{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 72vw;
+    }
+    .sheetBody{
+      padding:12px;
+      overflow:auto;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(12,12,14,.35);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .panelTitle{
+      font-size:13px;
+      font-weight:900;
+      margin:0;
+    }
+    .small{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+    .mono{font-family:var(--mono);}
+
+    label{font-size:12px; color:var(--muted);}
+    input[type="text"], textarea{
+      width:100%;
+      border:1px solid var(--line2);
+      background: rgba(10,10,12,.55);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 10px;
+      outline:none;
+      font-size:13px;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    textarea{
+      min-height: 140px;
+      resize: vertical;
+      font-family: var(--mono);
+      font-size:12px;
+      line-height:1.45;
+    }
+    input:focus, textarea:focus{border-color:#6d6d78; background: rgba(12,12,14,.7)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .col{display:flex; flex-direction:column; gap:6px}
+    .hr{height:1px; background: var(--line); margin:2px 0}
+
+    /* Project cards */
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width: 980px){
+      body{overflow:auto}
+      .main{min-height: 780px;}
+      .stage{min-height: 720px;}
+      .mainTop .hint{white-space:normal}
+      .cards{grid-template-columns: 1fr;}
+    }
+    .card{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      background: rgba(10,10,12,.45);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .card h4{
+      margin:0;
+      font-size:13px;
+      font-weight:900;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:8px 10px;
+      align-items:start;
+      font-size:12px;
+      color: var(--muted);
+    }
+    .kv b{color: var(--text); font-weight:800}
+    .link{
+      color: var(--text);
+      text-decoration: underline;
+      text-decoration-color: rgba(255,255,255,.25);
+      text-underline-offset: 2px;
+    }
+
+    /* CV placeholder */
+    .cvBox{
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(10,10,12,.35);
+      padding:12px;
+    }
+
+    dialog{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(18,18,20,.96);
+      color:var(--text);
+      max-width:720px;
+      width:calc(100vw - 28px);
+      box-shadow: var(--shadow);
+    }
+    .dlgHead{
+      padding: 14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .dlgBody{
+      padding: 14px;
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .dlgActions{
+      padding: 0 14px 14px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+  </style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="app">
+  <header>
+    <div>
+      <h1 id="heroTitle">L — Autonomous Systems Applicant</h1>
+      <p class="sub" id="heroSub">
+        Impact-driven: I want to help unlock the low-altitude economy through autonomous UAV systems, and improve productivity with AI so people can spend more time exploring and creating.
+      </p>
+    </div>
+    <div class="headerRight">
+      <span class="badge" id="saveBadge">Saved</span>
+      <span class="badge" id="storeBadge">Storage: checking…</span>
+      <span class="badge" id="langBadge">EN</span>
+    </div>
+  </header>
+
+  <section class="main">
+    <div class="mainTop">
+      <div class="hint" id="topHint">
+        Hover interaction: near → spheres move closer, brighten & scale up; far → move away, darken & scale down. No overlap; max displacement ≤ 10%.
+      </div>
+      <div class="tools">
+        <button class="btn ghost" id="btnLang" type="button">中文</button>
+        <button class="btn ghost" id="btnDownloadText" type="button">Download Text</button>
+        <button class="btn ghost" id="btnExportJSON" type="button">Export JSON</button>
+        <label class="btn ghost" for="importJSON" style="cursor:pointer">
+          Import JSON
+          <input id="importJSON" type="file" accept="application/json" style="display:none" />
+        </label>
+        <button class="btn danger ghost" id="btnClearAll" type="button">Clear</button>
+      </div>
+    </div>
+
+    <div class="stage" id="stage"></div>
+  </section>
+</div>
+
+<!-- Overlay sheet -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheetHead">
+      <div class="left">
+        <h2 class="sheetTitle" id="sheetTitle">Title</h2>
+        <p class="sheetSub" id="sheetSub">Subtitle</p>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="btnCloseSheet" type="button">Close</button>
+      </div>
+    </div>
+    <div class="sheetBody" id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<dialog id="confirmDlg">
+  <div class="dlgHead">
+    <div style="font-weight:900" id="confirmTitle">Confirm</div>
+    <div></div>
+  </div>
+  <div class="dlgBody" id="confirmBody"></div>
+  <div class="dlgActions">
+    <button class="btn ghost" id="confirmNo" type="button">Cancel</button>
+    <button class="btn" id="confirmYes" type="button">OK</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  // Rule: prevent ALL keyboard default actions
+  window.addEventListener('keydown', (e) => { e.preventDefault(); }, {capture:true});
+
+  const $ = (sel, el=document) => el.querySelector(sel);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp  = (a,b,t) => a + (b-a)*t;
+  const uid   = () => 'id_' + Math.random().toString(16).slice(2) + '_' + Date.now().toString(16);
+  const nonlinear2 = (t) => t*t;
+
+  function escapeHtml(s){
+    return (s ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function formatBytes(bytes){
+    if(typeof bytes !== 'number' || !isFinite(bytes)) return '-';
+    const u = ['B','KB','MB','GB','TB'];
+    let i = 0, n = bytes;
+    while(n >= 1024 && i < u.length-1){ n/=1024; i++; }
+    return (i===0 ? n.toFixed(0) : n.toFixed(1)) + ' ' + u[i];
+  }
+
+  // ===========================
+  // Model (all editable + exportable)
+  // ===========================
+  const LS_KEY = 'L_admissions_site_v1';
+
+  const DEFAULT_FORM_EMBED_URL = 'https://docs.google.com/forms/d/e/PLACEHOLDER/viewform?embedded=true';
+  const DEFAULT_YT_URL = 'https://www.youtube.com/';
+
+  let model = {
+    version: 1,
+    lang: 'en', // 'en' | 'zh'
+    content: {
+      en: {
+        heroTitle: 'L — Autonomous Systems Applicant',
+        heroSub: 'Impact-driven: I want to help unlock the low-altitude economy through autonomous UAV systems, and improve productivity with AI so people can spend more time exploring and creating.',
+        topHint: 'Hover interaction: near → spheres move closer, brighten & scale up; far → move away, darken & scale down. No overlap; max displacement ≤ 10%.',
+        spheres: {
+          home:   {title:'Home', desc:'Your one-line highlight & site overview', tiny:''},
+          about:  {title:'About', desc:'Applicant profile, strengths & motivation', tiny:''},
+          projects:{title:'Projects', desc:'Roadmap: "Autonomous UAV Mission"', tiny:''},
+          pubs:   {title:'Publications', desc:'Papers & reports (in progress)', tiny:''},
+          contact:{title:'Contact', desc:'Email + leave a message (Form)', tiny:''},
+          cv:     {title:'CV', desc:'Web CV now; PDF coming soon', tiny:''},
+          edit:   {title:'Edit', desc:'Edit all texts & links (saved locally)', tiny:'LOCAL'},
+        },
+        sections: {
+          home: {
+            headline: 'Highlight',
+            highlight: 'I am impact-driven and execution-oriented: I turn goals into tangible outcomes while staying focused on real-world value.',
+            focusTitle: 'Focus',
+            focusBody: 'Autonomous UAV missions, flight control & navigation foundations, and building toward task-level autonomy for practical deployments.',
+            orderHint: 'Admissions-friendly flow: highlight → roadmap → demo video.',
+          },
+          about: {
+            title: 'About',
+            body:
+`I'm L, an undergraduate student passionate about aerospace and autonomous systems. My long-term goal is to become a researcher focused on autonomous UAV missions—building systems that can reliably take off, follow waypoints, and land safely, and ultimately scale toward task-level autonomy. What motivates me most is impact: I'm excited by how UAV autonomy can contribute to the low-altitude economy, and how AI can improve productivity so people can spend more time on exploration and creation.
+
+I value self-driven learning and practical execution. In the past semester, I maintained a consistent learning routine for Python (3 days per week, at least 1 hour per day) and reached object-oriented programming and class-based design. Beyond technical learning, I also strengthened my organizational and communication skills by revitalizing an inactive student club—growing membership to 30 and successfully hosting its first official event. This experience taught me how to communicate clearly, coordinate participants, and turn ideas into outcomes.
+
+I am preparing to apply for an MSc in Robotics / Autonomous Systems. I hope to develop solid foundations in flight control, navigation, and autonomy through structured coursework and hands-on projects, and to contribute to research and engineering teams working on real-world UAV autonomy.`
+          },
+          projects: {
+            title: 'Projects (Roadmap)',
+            mainProjectTitle: 'Autonomous UAV Mission: From Navigation to Task-level Autonomy',
+            goal: 'Simulation demo: auto takeoff → waypoint navigation → auto landing.',
+            method: 'Start with a minimal reproducible pipeline, then gradually improve robustness and autonomy.',
+            milestones: [
+              {when:'Now', what:'Set up simulation environment; document baseline pipeline; define evaluation checklist.'},
+              {when:'Next (1–2 months)', what:'Implement waypoint mission; tune stability; produce a clean demo video.'},
+              {when:'Later (3–6 months)', what:'Extend to reliability improvements (disturbance handling, safety checks) and clearer evaluation.'}
+            ],
+            demoTitle: 'Demo Video (YouTube)',
+            demoUrl: DEFAULT_YT_URL
+          },
+          pubs: {
+            title: 'Publications',
+            body: 'No publications yet. (In preparation) — I am building foundations and documenting a project roadmap toward autonomous UAV missions.'
+          },
+          contact: {
+            title: 'Contact',
+            emailLabel: 'Email',
+            emailValue: 'your_outlook@example.com',
+            messageTitle: 'Leave a message',
+            messageHint: 'Feel free to leave a message — I will reply by email within 48 hours.',
+            formEmbedUrl: DEFAULT_FORM_EMBED_URL
+          },
+          cv: {
+            title: 'CV',
+            body: 'Web CV is included here. PDF version: Coming soon.',
+            bullets: [
+              'Education: (edit this)',
+              'Skills: Python (OOP), learning autonomy & control foundations (edit this)',
+              'Leadership: grew a student club to 30 members; hosted first official event (edit this)'
+            ]
+          },
+          edit: {
+            title: 'Edit Content',
+            sub: 'All site content is editable here and saved to localStorage. Export/Import JSON for backup or moving computers.',
+            note: 'Tip: Replace the Google Form embed URL and YouTube demo URL when ready.'
+          }
+        }
+      },
+      zh: {
+        heroTitle: 'L — 个人申请网站（自主系统）',
+        heroSub: '影响力导向：希望通过无人机自主系统推动低空经济，并用 AI 提升生产力，让人类有更多时间探索与创造。',
+        topHint: '鼠标交互：靠近→球靠近鼠标、变亮变大；远离→远离鼠标、变黑变小；球不重叠，位移≤10%。',
+        spheres: {
+          home:   {title:'首页', desc:'闪光点一句话 + 网站概览', tiny:''},
+          about:  {title:'关于我', desc:'个人简介 / 能力证明 / 动机', tiny:''},
+          projects:{title:'项目路线图', desc:'主项目：无人机自主任务路线', tiny:''},
+          pubs:   {title:'论文与报告', desc:'（筹备中）', tiny:''},
+          contact:{title:'联系我', desc:'邮箱 + 留言表单', tiny:''},
+          cv:     {title:'简历', desc:'网页版简历；PDF 之后补', tiny:''},
+          edit:   {title:'编辑', desc:'编辑所有文字与链接（本地保存）', tiny:'LOCAL'},
+        },
+        sections: {
+          home: {
+            headline: '我的闪光点',
+            highlight: '我更关注真实价值与影响力：愿意把目标落实成可展示的结果，同时保持长期方向不偏航。',
+            focusTitle: '方向',
+            focusBody: '无人机自主飞行（从飞控/导航基础到任务级自主），面向实际应用场景与可演示成果。',
+            orderHint: '申请向结构：闪光点 → 路线图 → 演示视频。',
+          },
+          about: {
+            title: '关于我',
+            body:
+`我叫 L，本科阶段对航空航天与自主系统方向非常感兴趣。我的长期目标是成为研究员，聚焦无人机自主任务：先做出可复现的基础闭环（自动起飞→航点→自动降落），再逐步走向任务级自主。驱动我持续投入的，是影响力：我相信无人机自主能够推动低空经济，也相信 AI 能提升生产力，让人类把时间更多投入探索与创造。
+
+我具有较强的自驱与执行力。上一个学期我保持稳定的 Python 学习节奏（每周 3 天、每天至少 1 小时），学习并掌握了类/面向对象等内容。同时，我也注重组织与沟通能力：我推动一个不活跃社团完成转正，担任活动部长，社员增长至 30 人，并成功举办了第一次社团活动。这段经历让我学会更清晰地沟通、协调参与者，并把事情真正做成。
+
+我计划申请 Robotics / Autonomous Systems 方向硕士，并希望在飞控、导航与自主等方面打牢基础，通过持续的项目迭代与成果展示，逐步形成研究与工程能力。`
+          },
+          projects: {
+            title: '项目路线图（主项目）',
+            mainProjectTitle: 'Autonomous UAV Mission: From Navigation to Task-level Autonomy',
+            goal: '仿真演示：自动起飞 → 航点飞行 → 自动降落。',
+            method: '先跑通最小闭环，再逐步提升稳定性与可复现性。',
+            milestones: [
+              {when:'现在', what:'搭建仿真环境；整理最小闭环流程；制定评估清单。'},
+              {when:'未来 1–2 个月', what:'实现稳定航点任务；输出清晰演示视频。'},
+              {when:'未来 3–6 个月', what:'提高可靠性（抗扰/安全检查等），并补充更清晰的评估与复盘。'}
+            ],
+            demoTitle: '演示视频（YouTube）',
+            demoUrl: DEFAULT_YT_URL
+          },
+          pubs: {
+            title: '论文与报告',
+            body: '目前暂无论文（筹备中）。我正在通过项目路线图与持续输出，逐步积累研究与工程能力。'
+          },
+          contact: {
+            title: '联系我',
+            emailLabel: '邮箱',
+            emailValue: 'your_outlook@example.com',
+            messageTitle: '留言',
+            messageHint: '欢迎留言，我会在 48 小时内通过邮箱回复。',
+            formEmbedUrl: DEFAULT_FORM_EMBED_URL
+          },
+          cv: {
+            title: '简历（网页）',
+            body: '先提供网页版简历。PDF 版本：后续补充。',
+            bullets: [
+              '教育经历：（可编辑）',
+              '技能：Python（面向对象）；正在学习无人机自主与控制基础（可编辑）',
+              '经历：社员增长至 30；举办第一次社团活动；活动部长（可编辑）'
+            ]
+          },
+          edit: {
+            title: '编辑网站内容',
+            sub: '这里可以编辑网站所有文字与链接，并自动保存到本地。可导出/导入 JSON 备份或换电脑。',
+            note: '提示：后续替换 Google 表单嵌入链接与 YouTube 视频链接即可。'
+          }
+        }
+      }
+    },
+    updatedAt: Date.now()
+  };
+
+  // ===========================
+  // Elements
+  // ===========================
+  const els = {
+    bg: $('#bg'),
+    stage: $('#stage'),
+    overlay: $('#overlay'),
+    sheetTitle: $('#sheetTitle'),
+    sheetSub: $('#sheetSub'),
+    sheetBody: $('#sheetBody'),
+    btnCloseSheet: $('#btnCloseSheet'),
+
+    saveBadge: $('#saveBadge'),
+    storeBadge: $('#storeBadge'),
+    langBadge: $('#langBadge'),
+
+    heroTitle: $('#heroTitle'),
+    heroSub: $('#heroSub'),
+    topHint: $('#topHint'),
+
+    btnLang: $('#btnLang'),
+    btnDownloadText: $('#btnDownloadText'),
+    btnExportJSON: $('#btnExportJSON'),
+    importJSON: $('#importJSON'),
+    btnClearAll: $('#btnClearAll'),
+
+    confirmDlg: $('#confirmDlg'),
+    confirmTitle: $('#confirmTitle'),
+    confirmBody: $('#confirmBody'),
+    confirmNo: $('#confirmNo'),
+    confirmYes: $('#confirmYes'),
+  };
+
+  // ===========================
+  // Persistence
+  // ===========================
+  let saveTimer = null;
+  function setSaveBadge(text){ els.saveBadge.textContent = text; }
+  function scheduleSave(){
+    setSaveBadge(model.lang === 'zh' ? '保存中…' : 'Saving…');
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 220);
+  }
+  function saveNow(){
+    model.updatedAt = Date.now();
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify(model));
+      setSaveBadge(model.lang === 'zh' ? '已保存' : 'Saved');
+    }catch(e){
+      setSaveBadge(model.lang === 'zh' ? '保存失败' : 'Save failed');
+    }
+    refreshStorageBadge();
+    refreshSphereLabels();
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return;
+      const obj = JSON.parse(raw);
+      if(!obj || typeof obj !== 'object') return;
+      // merge cautiously
+      model = {
+        ...model,
+        ...obj,
+        content: {
+          en: {...model.content.en, ...(obj.content && obj.content.en ? obj.content.en : {})},
+          zh: {...model.content.zh, ...(obj.content && obj.content.zh ? obj.content.zh : {})},
+        }
+      };
+      if(obj.lang === 'en' || obj.lang === 'zh') model.lang = obj.lang;
+    }catch(e){}
+  }
+
+  async function refreshStorageBadge(){
+    if(!navigator.storage || !navigator.storage.estimate){
+      els.storeBadge.textContent = model.lang === 'zh' ? '存储：未知' : 'Storage: unknown';
+      return;
+    }
+    try{
+      const est = await navigator.storage.estimate();
+      els.storeBadge.textContent = (model.lang === 'zh' ? '存储：' : 'Storage: ')
+        + formatBytes(est.usage || 0) + ' / ' + formatBytes(est.quota || 0);
+    }catch(e){
+      els.storeBadge.textContent = model.lang === 'zh' ? '存储：未知' : 'Storage: unknown';
+    }
+  }
+
+  // ===========================
+  // Overlay helpers
+  // ===========================
+  function showSheet(title, sub, bodyBuilder){
+    els.sheetTitle.textContent = title;
+    els.sheetSub.textContent = sub;
+    els.sheetBody.innerHTML = '';
+    bodyBuilder(els.sheetBody);
+    els.overlay.classList.add('show');
+    els.overlay.setAttribute('aria-hidden', 'false');
+  }
+  function closeSheet(){
+    els.overlay.classList.remove('show');
+    els.overlay.setAttribute('aria-hidden', 'true');
+    els.sheetBody.innerHTML = '';
+  }
+  els.btnCloseSheet.addEventListener('click', closeSheet);
+  els.overlay.addEventListener('click', (e) => { if(e.target === els.overlay) closeSheet(); });
+
+  function confirmLike(title, message){
+    els.confirmTitle.textContent = title;
+    els.confirmBody.textContent = message;
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = (v) => {
+        if(done) return;
+        done = true;
+        els.confirmDlg.close();
+        cleanup();
+        resolve(v);
+      };
+      const onNo = () => finish(false);
+      const onYes = () => finish(true);
+      const cleanup = () => {
+        els.confirmNo.removeEventListener('click', onNo);
+        els.confirmYes.removeEventListener('click', onYes);
+      };
+      els.confirmNo.addEventListener('click', onNo);
+      els.confirmYes.addEventListener('click', onYes);
+      els.confirmDlg.showModal();
+    });
+  }
+
+  // ===========================
+  // Language apply
+  // ===========================
+  function t(){ return model.content[model.lang]; }
+  function applyLangToUI(){
+    const c = t();
+    els.heroTitle.textContent = c.heroTitle;
+    els.heroSub.textContent = c.heroSub;
+    els.topHint.textContent = c.topHint;
+
+    els.langBadge.textContent = model.lang.toUpperCase();
+    els.btnLang.textContent = model.lang === 'en' ? '中文' : 'EN';
+
+    els.btnDownloadText.textContent = model.lang === 'en' ? 'Download Text' : '下载文字';
+    els.btnExportJSON.textContent = model.lang === 'en' ? 'Export JSON' : '导出JSON';
+    // Import label text is inside label; keep as-is in UI but acceptable
+    els.btnClearAll.textContent = model.lang === 'en' ? 'Clear' : '清空';
+
+    setSaveBadge(model.lang === 'zh' ? '已保存' : 'Saved');
+  }
+
+  function toggleLang(){
+    model.lang = (model.lang === 'en') ? 'zh' : 'en';
+    scheduleSave();
+    applyLangToUI();
+    rebuildSpheres();
+  }
+
+  // ===========================
+  // Spheres layout + interaction
+  // ===========================
+  const spheres = [];
+  const pointer = {x:0, y:0, inside:false};
+
+  function randomScale(){ return 0.90 + Math.random()*0.20; }
+
+  function layoutAnchors(){
+    const rect = els.stage.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+
+    // 2 rows, 3 cols
+    const anchors = [
+      {key:'home',    x:0.20, y:0.28},
+      {key:'about',   x:0.50, y:0.28},
+      {key:'projects',x:0.80, y:0.28},
+
+      {key:'pubs',    x:0.20, y:0.66},
+      {key:'contact', x:0.50, y:0.66},
+      {key:'cv',      x:0.80, y:0.66},
+
+      // editor entry
+      {key:'edit',    x:0.50, y:0.90},
+    ];
+
+    return anchors.map(a => ({...a, ax:a.x*w, ay:a.y*h}));
+  }
+
+  function buildSpheres(){
+    els.stage.innerHTML = '';
+    spheres.length = 0;
+
+    const rect = els.stage.getBoundingClientRect();
+    const base = Math.min(rect.width, rect.height);
+
+    // base size increased 50% + random +-10%
+    const baseSize = clamp(base * 0.14, 110, 170) * 1.5;
+
+    const anchors = layoutAnchors();
+    const c = t();
+
+    for(const a of anchors){
+      const sc = randomScale();
+      const baseSizePx = baseSize * sc;
+      const baseR = baseSizePx / 2;
+
+      const el = document.createElement('div');
+      el.className = 'ball';
+      el.style.width = baseSizePx.toFixed(1) + 'px';
+      el.style.height = baseSizePx.toFixed(1) + 'px';
+      el.style.setProperty('--ballBright', '0');
+
+      const def = c.spheres[a.key];
+      el.innerHTML = `
+        <div class="label">
+          <div class="title">${escapeHtml(def.title)}</div>
+          <div class="desc">${escapeHtml(def.desc)}</div>
+          <div class="tiny">${escapeHtml(def.tiny || '')}</div>
+        </div>
+      `;
+
+      els.stage.appendChild(el);
+
+      const s = {
+        key: a.key,
+        el,
+        ax: a.ax, ay: a.ay,
+
+        ox: 0, oy: 0,
+        vx: 0, vy: 0,
+
+        baseR,
+        scale: 1,
+        scaleTarget: 1,
+        r: baseR,
+        rTarget: baseR,
+
+        bright: 0,
+        brightTarget: 0,
+
+        maxOffset: base * 0.10,
+        influence: clamp(base * 0.30, 220, 360),
+
+        x: a.ax, y: a.ay
+      };
+
+      el.addEventListener('click', () => onSphereClick(s.key));
+      spheres.push(s);
+    }
+
+    renderSpheres();
+  }
+
+  function refreshSphereLabels(){
+    const c = t();
+    for(const s of spheres){
+      const def = c.spheres[s.key];
+      if(!def) continue;
+      const titleEl = s.el.querySelector('.title');
+      const descEl  = s.el.querySelector('.desc');
+      const tinyEl  = s.el.querySelector('.tiny');
+      if(titleEl) titleEl.textContent = def.title;
+      if(descEl)  descEl.textContent  = def.desc;
+      if(tinyEl)  tinyEl.textContent  = def.tiny || '';
+    }
+  }
+
+  function placeSphere(s, w, h){
+    s.x = s.ax + s.ox;
+    s.y = s.ay + s.oy;
+    const pad = 14;
+    s.x = clamp(s.x, s.r + pad, w - s.r - pad);
+    s.y = clamp(s.y, s.r + pad, h - s.r - pad);
+  }
+
+  function renderSpheres(){
+    for(const s of spheres){
+      const tx = (s.x - s.baseR);
+      const ty = (s.y - s.baseR);
+      const rx = Math.round(tx * 10) / 10;
+      const ry = Math.round(ty * 10) / 10;
+      s.el.style.transform = `translate3d(${rx}px, ${ry}px, 0) scale(${s.scale.toFixed(4)})`;
+    }
+  }
+
+  function tickSpheres(){
+    const rect = els.stage.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+    const mx = pointer.x - rect.left;
+    const my = pointer.y - rect.top;
+
+    // tuned to reduce jitter
+    const damping = 0.90;
+    const springBack = 0.020;
+    const mouseAttract = 0.052;
+    const mouseRepel = 0.028;
+    const collideK = 0.070;
+    const maxV = 12;
+
+    // 1) targets from mouse distance (linear scale)
+    for(const s of spheres){
+      const px = s.ax + s.ox;
+      const py = s.ay + s.oy;
+      const d = Math.hypot(px - mx, py - my) || 0.0001;
+      const tdist = clamp(d / s.influence, 0, 1);
+
+      // near 1.5, far 0.5
+      s.scaleTarget = lerp(1.5, 0.5, tdist);
+      s.scale = lerp(s.scale, s.scaleTarget, 0.14);
+
+      s.rTarget = s.baseR * s.scale;
+      s.r = lerp(s.r, s.rTarget, 0.18);
+
+      // brightness (near gray, far black)
+      s.brightTarget = 1 - tdist;
+      s.bright = lerp(s.bright, s.brightTarget, 0.20);
+      const gray = Math.round(140 * s.bright);
+      s.el.style.setProperty('--ballBright', String(gray));
+    }
+
+    // 2) spring + mouse forces
+    for(const s of spheres){
+      s.vx += (-s.ox) * springBack;
+      s.vy += (-s.oy) * springBack;
+
+      if(pointer.inside){
+        const px = s.ax + s.ox;
+        const py = s.ay + s.oy;
+        const dx = mx - px;
+        const dy = my - py;
+        const dist = Math.hypot(dx,dy) || 0.0001;
+
+        const tdist = clamp(dist / s.influence, 0, 1);
+        const wNear = 1 - tdist;
+        const wFar = tdist;
+
+        const ux = dx / dist, uy = dy / dist;
+
+        // near: attract
+        s.vx += ux * nonlinear2(wNear) * mouseAttract * 40;
+        s.vy += uy * nonlinear2(wNear) * mouseAttract * 40;
+
+        // far: repel
+        s.vx -= ux * nonlinear2(wFar) * mouseRepel * 28;
+        s.vy -= uy * nonlinear2(wFar) * mouseRepel * 28;
+      }
+
+      s.vx *= damping;
+      s.vy *= damping;
+      s.vx = clamp(s.vx, -maxV, maxV);
+      s.vy = clamp(s.vy, -maxV, maxV);
+
+      s.ox += s.vx;
+      s.oy += s.vy;
+
+      // clamp offsets to 10%
+      const od = Math.hypot(s.ox, s.oy) || 0.0001;
+      if(od > s.maxOffset){
+        s.ox = (s.ox / od) * s.maxOffset;
+        s.oy = (s.oy / od) * s.maxOffset;
+      }
+    }
+
+    // 3) collision (no overlap), iterative stabilize
+    const iterations = 5;
+    for(let iter=0; iter<iterations; iter++){
+      for(let i=0;i<spheres.length;i++){
+        for(let j=i+1;j<spheres.length;j++){
+          const a = spheres[i], b = spheres[j];
+
+          const ax = a.ax + a.ox, ay = a.ay + a.oy;
+          const bx = b.ax + b.ox, by = b.ay + b.oy;
+
+          const dx = bx - ax;
+          const dy = by - ay;
+          const dist = Math.hypot(dx,dy) || 0.0001;
+
+          const minDist = (a.r + b.r) + 8;
+          if(dist < minDist){
+            const overlap = (minDist - dist);
+            const ratio = clamp(overlap / minDist, 0, 1);
+            const push = nonlinear2(ratio) * collideK * 90;
+
+            const ux = dx / dist, uy = dy / dist;
+
+            a.ox -= ux * push * 0.5;
+            a.oy -= uy * push * 0.5;
+            b.ox += ux * push * 0.5;
+            b.oy += uy * push * 0.5;
+
+            // damp along axis to reduce oscillation
+            const av = a.vx*ux + a.vy*uy;
+            const bv = b.vx*ux + b.vy*uy;
+            a.vx -= ux * av * 0.35;
+            a.vy -= uy * av * 0.35;
+            b.vx -= ux * bv * 0.35;
+            b.vy -= uy * bv * 0.35;
+
+            // clamp offsets
+            const oda = Math.hypot(a.ox, a.oy) || 0.0001;
+            if(oda > a.maxOffset){ a.ox = (a.ox/oda)*a.maxOffset; a.oy = (a.oy/oda)*a.maxOffset; }
+            const odb = Math.hypot(b.ox, b.oy) || 0.0001;
+            if(odb > b.maxOffset){ b.ox = (b.ox/odb)*b.maxOffset; b.oy = (b.oy/odb)*b.maxOffset; }
+          }
+        }
+      }
+    }
+
+    // 4) place & render
+    for(const s of spheres){ placeSphere(s, w, h); }
+    renderSpheres();
+
+    requestAnimationFrame(tickSpheres);
+  }
+
+  els.stage.addEventListener('pointerenter', () => { pointer.inside = true; }, {passive:true});
+  els.stage.addEventListener('pointerleave', () => { pointer.inside = false; }, {passive:true});
+  window.addEventListener('pointermove', (e) => { pointer.x = e.clientX; pointer.y = e.clientY; }, {passive:true});
+
+  function rebuildSpheres(){
+    buildSpheres();
+    refreshSphereLabels();
+  }
+
+  // ===========================
+  // Pages content render
+  // ===========================
+  function onSphereClick(key){
+    const c = t();
+    if(key === 'home') return openHome();
+    if(key === 'about') return openAbout();
+    if(key === 'projects') return openProjects();
+    if(key === 'pubs') return openPubs();
+    if(key === 'contact') return openContact();
+    if(key === 'cv') return openCV();
+    if(key === 'edit') return openEditor();
+  }
+
+  function openHome(){
+    const c = t();
+    const sec = c.sections.home;
+    showSheet(c.spheres.home.title, c.spheres.home.desc, (root) => {
+      const p = document.createElement('div');
+      p.className = 'panel';
+      p.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.headline)}</h3>
+        <div class="small">${escapeHtml(sec.highlight)}</div>
+        <div class="hr"></div>
+        <h3 class="panelTitle">${escapeHtml(sec.focusTitle)}</h3>
+        <div class="small">${escapeHtml(sec.focusBody)}</div>
+        <div class="hr"></div>
+        <div class="small">${escapeHtml(sec.orderHint)}</div>
+      `;
+      root.appendChild(p);
+    });
+  }
+
+  function openAbout(){
+    const c = t();
+    const sec = c.sections.about;
+    showSheet(c.spheres.about.title, c.spheres.about.desc, (root) => {
+      const p = document.createElement('div');
+      p.className = 'panel';
+      p.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.title)}</h3>
+        <div class="small" style="white-space:pre-wrap">${escapeHtml(sec.body)}</div>
+      `;
+      root.appendChild(p);
+    });
+  }
+
+  function openProjects(){
+    const c = t();
+    const sec = c.sections.projects;
+    showSheet(c.spheres.projects.title, c.spheres.projects.desc, (root) => {
+      const top = document.createElement('div');
+      top.className = 'panel';
+      top.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.title)}</h3>
+        <div class="cards">
+          <div class="card">
+            <h4>${escapeHtml(sec.mainProjectTitle)}</h4>
+            <div class="kv">
+              <div><b>Goal</b></div><div>${escapeHtml(sec.goal)}</div>
+              <div><b>Approach</b></div><div>${escapeHtml(sec.method)}</div>
+            </div>
+          </div>
+          <div class="card">
+            <h4>${escapeHtml(sec.demoTitle)}</h4>
+            <div class="small">
+              <a class="link" href="${escapeHtml(sec.demoUrl)}" target="_blank" rel="noopener">Open YouTube link</a>
+            </div>
+            <div class="small mono">${escapeHtml(sec.demoUrl)}</div>
+            <div class="small">${model.lang === 'en'
+              ? 'Tip: replace this link with your final demo video URL.'
+              : '提示：后续把这里替换成你的最终演示视频链接。'
+            }</div>
+          </div>
+        </div>
+      `;
+      root.appendChild(top);
+
+      const mile = document.createElement('div');
+      mile.className = 'panel';
+      mile.innerHTML = `<h3 class="panelTitle">${model.lang === 'en' ? 'Milestones' : '里程碑'}</h3>`;
+      const list = document.createElement('div');
+      list.className = 'cards';
+      sec.milestones.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h4>${escapeHtml(m.when)}</h4>
+          <div class="small">${escapeHtml(m.what)}</div>
+        `;
+        list.appendChild(card);
+      });
+      mile.appendChild(list);
+      root.appendChild(mile);
+    });
+  }
+
+  function openPubs(){
+    const c = t();
+    const sec = c.sections.pubs;
+    showSheet(c.spheres.pubs.title, c.spheres.pubs.desc, (root) => {
+      const p = document.createElement('div');
+      p.className = 'panel';
+      p.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.title)}</h3>
+        <div class="small">${escapeHtml(sec.body)}</div>
+      `;
+      root.appendChild(p);
+    });
+  }
+
+  function openContact(){
+    const c = t();
+    const sec = c.sections.contact;
+    showSheet(c.spheres.contact.title, c.spheres.contact.desc, (root) => {
+      const p = document.createElement('div');
+      p.className = 'panel';
+      p.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.title)}</h3>
+        <div class="kv" style="grid-template-columns: 120px 1fr">
+          <div><b>${escapeHtml(sec.emailLabel)}</b></div>
+          <div><a class="link" href="mailto:${escapeHtml(sec.emailValue)}">${escapeHtml(sec.emailValue)}</a></div>
+        </div>
+      `;
+      root.appendChild(p);
+
+      const formPanel = document.createElement('div');
+      formPanel.className = 'panel';
+      formPanel.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.messageTitle)}</h3>
+        <div class="small">${escapeHtml(sec.messageHint)}</div>
+        <div class="hr"></div>
+        <div style="border:1px solid rgba(255,255,255,.10); border-radius:16px; overflow:hidden; background: rgba(0,0,0,.18);">
+          <iframe
+            title="Message Form"
+            src="${escapeHtml(sec.formEmbedUrl)}"
+            style="width:100%; height:620px; border:0; display:block;"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+        <div class="small mono" style="word-break:break-all">${escapeHtml(sec.formEmbedUrl)}</div>
+      `;
+      root.appendChild(formPanel);
+    });
+  }
+
+  function openCV(){
+    const c = t();
+    const sec = c.sections.cv;
+    showSheet(c.spheres.cv.title, c.spheres.cv.desc, (root) => {
+      const p = document.createElement('div');
+      p.className = 'panel';
+      p.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.title)}</h3>
+        <div class="small">${escapeHtml(sec.body)}</div>
+        <div class="hr"></div>
+        <div class="cvBox">
+          <div class="small" style="margin-bottom:8px">${model.lang === 'en' ? 'Quick bullets (editable):' : '要点（可编辑）：'}</div>
+          <ul class="small" style="margin:0; padding-left: 18px">
+            ${sec.bullets.map(x => `<li>${escapeHtml(x)}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+      root.appendChild(p);
+    });
+  }
+
+  function openEditor(){
+    const c = t();
+    const sec = c.sections.edit;
+
+    showSheet(c.spheres.edit.title, c.spheres.edit.desc, (root) => {
+      const top = document.createElement('div');
+      top.className = 'panel';
+      top.innerHTML = `
+        <h3 class="panelTitle">${escapeHtml(sec.title)}</h3>
+        <div class="small">${escapeHtml(sec.sub)}</div>
+        <div class="small">${escapeHtml(sec.note)}</div>
+      `;
+      root.appendChild(top);
+
+      const langPanel = document.createElement('div');
+      langPanel.className = 'panel';
+      langPanel.innerHTML = `
+        <h3 class="panelTitle">${model.lang === 'en' ? 'Edit (current language)' : '编辑（当前语言）'}</h3>
+        <div class="small">${model.lang === 'en'
+          ? 'You are editing EN content now. Switch to 中文 to edit Chinese texts.'
+          : '你正在编辑中文内容。切换到 EN 可编辑英文内容。'
+        }</div>
+      `;
+      root.appendChild(langPanel);
+
+      const editor = document.createElement('div');
+      editor.className = 'panel';
+      editor.innerHTML = `
+        <h3 class="panelTitle">${model.lang === 'en' ? 'Core' : '核心内容'}</h3>
+        <div class="col">
+          <label>${model.lang === 'en' ? 'Hero title' : '首页标题'}</label>
+          <input id="ed_heroTitle" type="text" value="${escapeHtml(c.heroTitle)}">
+        </div>
+        <div class="col">
+          <label>${model.lang === 'en' ? 'Hero subtitle' : '首页副标题'}</label>
+          <textarea id="ed_heroSub">${escapeHtml(c.heroSub)}</textarea>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 class="panelTitle">${model.lang === 'en' ? 'About text' : '关于我正文'}</h3>
+        <textarea id="ed_aboutBody">${escapeHtml(c.sections.about.body)}</textarea>
+
+        <div class="hr"></div>
+
+        <h3 class="panelTitle">${model.lang === 'en' ? 'Projects links' : '项目链接'}</h3>
+        <div class="col">
+          <label>${model.lang === 'en' ? 'YouTube demo URL' : 'YouTube 演示链接'}</label>
+          <input id="ed_demoUrl" type="text" value="${escapeHtml(c.sections.projects.demoUrl)}">
+        </div>
+        <div class="col">
+          <label>${model.lang === 'en' ? 'Google Form embed URL' : 'Google 表单嵌入链接'}</label>
+          <input id="ed_formUrl" type="text" value="${escapeHtml(c.sections.contact.formEmbedUrl)}">
+          <div class="small">${model.lang === 'en'
+            ? 'Tip: use the "Embed <>" URL from Google Forms, like: https://docs.google.com/forms/d/e/.../viewform?embedded=true'
+            : '提示：使用 Google 表单"嵌入 < >"得到的链接，一般以 viewform?embedded=true 结尾。'
+          }</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 class="panelTitle">${model.lang === 'en' ? 'Contact' : '联系方式'}</h3>
+        <div class="col">
+          <label>${model.lang === 'en' ? 'Public email' : '公开邮箱地址'}</label>
+          <input id="ed_email" type="text" value="${escapeHtml(c.sections.contact.emailValue)}">
+        </div>
+        <div class="col">
+          <label>${model.lang === 'en' ? 'Message hint (48h response)' : '留言提示语（48小时回复）'}</label>
+          <input id="ed_messageHint" type="text" value="${escapeHtml(c.sections.contact.messageHint)}">
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 class="panelTitle">${model.lang === 'en' ? 'Sphere labels (optional)' : '球形标签（可选）'}</h3>
+        <div class="small">${model.lang === 'en'
+          ? 'These are the sphere titles/descriptions on the homepage.'
+          : '这些是主页球形目录的标题与简介。'
+        }</div>
+
+        <div class="cards" id="sphereEditor"></div>
+      `;
+      root.appendChild(editor);
+
+      // bind core fields
+      const bindInput = (id, getterSetter) => {
+        const el = editor.querySelector('#' + id);
+        el.addEventListener('input', () => {
+          getterSetter(el.value);
+          scheduleSave();
+          applyLangToUI();
+          refreshSphereLabels();
+        });
+      };
+
+      bindInput('ed_heroTitle', (v) => { c.heroTitle = v; });
+      bindInput('ed_heroSub', (v) => { c.heroSub = v; });
+      bindInput('ed_aboutBody', (v) => { c.sections.about.body = v; });
+      bindInput('ed_demoUrl', (v) => { c.sections.projects.demoUrl = v; });
+      bindInput('ed_formUrl', (v) => { c.sections.contact.formEmbedUrl = v; });
+      bindInput('ed_email', (v) => { c.sections.contact.emailValue = v; });
+      bindInput('ed_messageHint', (v) => { c.sections.contact.messageHint = v; });
+
+      // sphere label editor
+      const sphereKeys = ['home','about','projects','pubs','contact','cv','edit'];
+      const se = editor.querySelector('#sphereEditor');
+
+      sphereKeys.forEach((k) => {
+        const box = document.createElement('div');
+        box.className = 'card';
+        box.innerHTML = `
+          <h4>${escapeHtml(k)}</h4>
+          <div class="col">
+            <label>${model.lang === 'en' ? 'Title' : '标题'}</label>
+            <input type="text" data-k="${escapeHtml(k)}" data-f="title" value="${escapeHtml(c.spheres[k].title)}">
+          </div>
+          <div class="col">
+            <label>${model.lang === 'en' ? 'Description' : '简介'}</label>
+            <input type="text" data-k="${escapeHtml(k)}" data-f="desc" value="${escapeHtml(c.spheres[k].desc)}">
+          </div>
+          <div class="col">
+            <label>${model.lang === 'en' ? 'Tiny (optional)' : '角标（可选）'}</label>
+            <input type="text" data-k="${escapeHtml(k)}" data-f="tiny" value="${escapeHtml(c.spheres[k].tiny || '')}">
+          </div>
+        `;
+        se.appendChild(box);
+      });
+
+      se.addEventListener('input', (e) => {
+        const t = e.target;
+        if(!(t instanceof HTMLInputElement)) return;
+        const k = t.getAttribute('data-k');
+        const f = t.getAttribute('data-f');
+        if(!k || !f) return;
+        if(!c.spheres[k]) return;
+        c.spheres[k][f] = t.value;
+        scheduleSave();
+        refreshSphereLabels();
+      });
+
+      // helper panel: backup
+      const backup = document.createElement('div');
+      backup.className = 'panel';
+      backup.innerHTML = `
+        <h3 class="panelTitle">${model.lang === 'en' ? 'Backup & Migration' : '备份与迁移'}</h3>
+        <div class="row">
+          <button class="btn" id="bkText" type="button">${model.lang === 'en' ? 'Download Text' : '下载文字'}</button>
+          <button class="btn ghost" id="bkJson" type="button">${model.lang === 'en' ? 'Export JSON' : '导出JSON'}</button>
+          <label class="btn ghost" style="cursor:pointer">
+            ${model.lang === 'en' ? 'Import JSON' : '导入JSON'}
+            <input id="bkIn" type="file" accept="application/json" style="display:none">
+          </label>
+        </div>
+        <div class="small">${model.lang === 'en'
+          ? 'Use JSON export/import when moving to another computer.'
+          : '换电脑/换浏览器时，使用 JSON 导出/导入迁移内容。'
+        }</div>
+      `;
+      root.appendChild(backup);
+
+      backup.querySelector('#bkText').addEventListener('click', downloadAllText);
+      backup.querySelector('#bkJson').addEventListener('click', exportJSON);
+      backup.querySelector('#bkIn').addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if(f) await importJSON(f);
+      });
+    });
+  }
+
+  // ===========================
+  // Export/Import/Download/Clear
+  // ===========================
+  function downloadTextFile(content, filename){
+    const blob = new Blob([content], {type:'text/plain;charset=UTF-8'});
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+  }
+
+  function allToText(){
+    const cEN = model.content.en;
+    const cZH = model.content.zh;
+
+    const lines = [];
+    lines.push('L — Personal Website (Backup)');
+    lines.push('Export time: ' + new Date().toLocaleString());
+    lines.push('');
+    lines.push('[EN] Hero: ' + (cEN.heroTitle || ''));
+    lines.push(cEN.heroSub || '');
+    lines.push('');
+    lines.push('[EN] About:');
+    lines.push(cEN.sections.about.body || '');
+    lines.push('');
+    lines.push('[EN] Projects:');
+    lines.push('Title: ' + (cEN.sections.projects.mainProjectTitle || ''));
+    lines.push('Goal: ' + (cEN.sections.projects.goal || ''));
+    lines.push('Demo: ' + (cEN.sections.projects.demoUrl || ''));
+    lines.push('');
+    lines.push('[EN] Contact: ' + (cEN.sections.contact.emailValue || ''));
+    lines.push('Form: ' + (cEN.sections.contact.formEmbedUrl || ''));
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    lines.push('[ZH] 标题：' + (cZH.heroTitle || ''));
+    lines.push(cZH.heroSub || '');
+    lines.push('');
+    lines.push('[ZH] 关于我：');
+    lines.push(cZH.sections.about.body || '');
+    lines.push('');
+    lines.push('[ZH] 项目：');
+    lines.push('标题：' + (cZH.sections.projects.mainProjectTitle || ''));
+    lines.push('目标：' + (cZH.sections.projects.goal || ''));
+    lines.push('演示：' + (cZH.sections.projects.demoUrl || ''));
+    lines.push('');
+    lines.push('[ZH] 联系：' + (cZH.sections.contact.emailValue || ''));
+    lines.push('表单：' + (cZH.sections.contact.formEmbedUrl || ''));
+    return lines.join('\n');
+  }
+
+  function downloadAllText(){
+    downloadTextFile(allToText(), 'L_site_backup.txt');
+  }
+
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify(model, null, 2)], {type:'application/json;charset=UTF-8'});
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = 'L_site_export.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+  }
+
+  async function importJSON(file){
+    try{
+      const text = await file.text();
+      const obj = JSON.parse(text);
+      if(!obj || typeof obj !== 'object') return;
+
+      // minimal merge
+      if(obj.lang === 'en' || obj.lang === 'zh') model.lang = obj.lang;
+
+      if(obj.content && obj.content.en) model.content.en = {...model.content.en, ...obj.content.en};
+      if(obj.content && obj.content.zh) model.content.zh = {...model.content.zh, ...obj.content.zh};
+
+      model.updatedAt = Date.now();
+      scheduleSave();
+      applyLangToUI();
+      rebuildSpheres();
+    }catch(e){}
+  }
+
+  async function clearAll(){
+    const title = model.lang === 'en' ? 'Clear all' : '清空全部';
+    const msg = model.lang === 'en'
+      ? 'Are you sure you want to clear all locally saved edits? This cannot be undone.'
+      : '确定清空所有本地保存的编辑内容吗？此操作不可撤回。';
+    const ok = await confirmLike(title, msg);
+    if(!ok) return;
+    try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    // reload default by hard reset
+    location.reload();
+  }
+
+  els.btnLang.addEventListener('click', toggleLang);
+  els.btnDownloadText.addEventListener('click', downloadAllText);
+  els.btnExportJSON.addEventListener('click', exportJSON);
+  els.importJSON.addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if(f) await importJSON(f);
+  });
+  els.btnClearAll.addEventListener('click', clearAll);
+
+  // ===========================
+  // Background canvas animation
+  // ===========================
+  const ctx = els.bg.getContext('2d', {alpha:true});
+  const bgPointer = {x:0.5, y:0.5, vx:0, vy:0, down:false};
+  const blobs = [];
+  const BLOB_COUNT = 16;
+
+  function resizeBg(){
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    els.bg.width = Math.floor(innerWidth * dpr);
+    els.bg.height = Math.floor(innerHeight * dpr);
+    els.bg.style.width = innerWidth + 'px';
+    els.bg.style.height = innerHeight + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function initBg(){
+    blobs.length = 0;
+    for(let i=0;i<BLOB_COUNT;i++){
+      blobs.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: 0.05 + Math.random()*0.12,
+        a: 0.22 + Math.random()*0.35,
+        vx: (Math.random()-.5)*0.0008,
+        vy: (Math.random()-.5)*0.0008,
+        phase: Math.random()*Math.PI*2
+      });
+    }
+  }
+  function drawBg(){
+    const w = innerWidth, h = innerHeight;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = 'rgba(255,255,255,0.02)';
+    ctx.fillRect(0,0,w,h);
+
+    for(const b of blobs){
+      b.phase += 0.01;
+      b.x += b.vx + Math.sin(b.phase)*0.00015 + bgPointer.vx*0.0007;
+      b.y += b.vy + Math.cos(b.phase)*0.00015 + bgPointer.vy*0.0007;
+
+      if(b.x < -0.2) b.x = 1.2;
+      if(b.x > 1.2) b.x = -0.2;
+      if(b.y < -0.2) b.y = 1.2;
+      if(b.y > 1.2) b.y = -0.2;
+
+      const cx = b.x*w;
+      const cy = b.y*h;
+      const rr = Math.max(30, b.r * Math.min(w,h) * (bgPointer.down ? 1.25 : 1.0));
+
+      const g = ctx.createRadialGradient(cx,cy,0,cx,cy,rr);
+      g.addColorStop(0, `rgba(255,255,255,${0.12*b.a})`);
+      g.addColorStop(0.35, `rgba(180,180,180,${0.10*b.a})`);
+      g.addColorStop(1, `rgba(0,0,0,0)`);
+
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(cx,cy,rr,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    const vg = ctx.createRadialGradient(w*0.5,h*0.45,Math.min(w,h)*0.1,w*0.5,h*0.5,Math.max(w,h)*0.7);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0,0,w,h);
+
+    requestAnimationFrame(drawBg);
+  }
+
+  window.addEventListener('pointermove', (e) => {
+    const nx = e.clientX / Math.max(1, innerWidth);
+    const ny = e.clientY / Math.max(1, innerHeight);
+    const dx = nx - bgPointer.x;
+    const dy = ny - bgPointer.y;
+    bgPointer.vx = dx;
+    bgPointer.vy = dy;
+    bgPointer.x = nx;
+    bgPointer.y = ny;
+  }, {passive:true});
+  window.addEventListener('pointerdown', () => { bgPointer.down = true; }, {passive:true});
+  window.addEventListener('pointerup', () => { bgPointer.down = false; }, {passive:true});
+
+  // ===========================
+  // Init
+  // ===========================
+  function init(){
+    load();
+    applyLangToUI();
+
+    resizeBg();
+    initBg();
+    requestAnimationFrame(drawBg);
+
+    rebuildSpheres();
+    requestAnimationFrame(tickSpheres);
+
+    window.addEventListener('resize', () => {
+      resizeBg();
+      rebuildSpheres();
+    });
+
+    pointer.x = innerWidth * 0.5;
+    pointer.y = innerHeight * 0.5;
+
+    saveNow();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
